@@ -120,6 +120,7 @@ FLOWS = [
     "neato",
     "nest",
     "netatmo",
+    "neveralone",
     "nexia",
     "nightscout",
     "notion",
