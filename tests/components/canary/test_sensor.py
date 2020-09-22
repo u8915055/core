@@ -11,7 +11,7 @@ from homeassistant.components.canary.sensor import (
     STATE_AIR_QUALITY_VERY_ABNORMAL,
     CanarySensor,
 )
-from homeassistant.const import TEMP_CELSIUS, UNIT_PERCENTAGE
+from homeassistant.const import PERCENTAGE, TEMP_CELSIUS
 
 from tests.async_mock import Mock
 from tests.common import get_test_home_assistant
@@ -34,10 +34,7 @@ class TestCanarySensorSetup(unittest.TestCase):
         """Initialize values for this testcase class."""
         self.hass = get_test_home_assistant()
         self.config = copy.deepcopy(VALID_CONFIG)
-
-    def tearDown(self):
-        """Stop everything that was started."""
-        self.hass.stop()
+        self.addCleanup(self.hass.stop)
 
     def test_setup_sensors(self):
         """Test the sensor setup."""
@@ -98,7 +95,7 @@ class TestCanarySensorSetup(unittest.TestCase):
         sensor.update()
 
         assert sensor.name == "Home Family Room Humidity"
-        assert sensor.unit_of_measurement == UNIT_PERCENTAGE
+        assert sensor.unit_of_measurement == PERCENTAGE
         assert sensor.state == 50.46
         assert sensor.icon == "mdi:water-percent"
 
@@ -185,7 +182,7 @@ class TestCanarySensorSetup(unittest.TestCase):
         sensor.update()
 
         assert sensor.name == "Home Family Room Battery"
-        assert sensor.unit_of_measurement == UNIT_PERCENTAGE
+        assert sensor.unit_of_measurement == PERCENTAGE
         assert sensor.state == 70.46
         assert sensor.icon == "mdi:battery-70"
 

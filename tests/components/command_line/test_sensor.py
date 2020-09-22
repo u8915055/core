@@ -14,10 +14,7 @@ class TestCommandSensorSensor(unittest.TestCase):
     def setUp(self):
         """Set up things to be run when tests are started."""
         self.hass = get_test_home_assistant()
-
-    def tearDown(self):
-        """Stop everything that was started."""
-        self.hass.stop()
+        self.addCleanup(self.hass.stop)
 
     def update_side_effect(self, data):
         """Side effect function for mocking CommandSensorData.update()."""
@@ -77,11 +74,13 @@ class TestCommandSensorSensor(unittest.TestCase):
         """Ensure command with templates and quotes get rendered properly."""
         self.hass.states.set("sensor.test_state", "Works 2")
         with patch(
-            "homeassistant.components.command_line.sensor.subprocess.check_output",
+            "homeassistant.components.command_line.subprocess.check_output",
             return_value=b"Works\n",
         ) as check_output:
             data = command_line.CommandSensorData(
-                self.hass, 'echo "{{ states.sensor.test_state.state }}" "3 4"', 15,
+                self.hass,
+                'echo "{{ states.sensor.test_state.state }}" "3 4"',
+                15,
             )
             data.update()
 
