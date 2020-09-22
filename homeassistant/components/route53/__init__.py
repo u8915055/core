@@ -66,6 +66,12 @@ def setup(hass, config):
     return True
 
 
+def _get_fqdn(record, domain):
+    if record == ".":
+        return domain
+    return f"{record}.{domain}"
+
+
 def _update_route53(
     aws_access_key_id: str,
     aws_secret_access_key: str,
@@ -84,7 +90,7 @@ def _update_route53(
 
     # Get the IP Address and build an array of changes
     try:
-        ipaddress = requests.get("https://api.ipify.org/", timeout=5).text()
+        ipaddress = requests.get("https://api.ipify.org/", timeout=5).text
 
     except requests.RequestException:
         _LOGGER.warning("Unable to reach the ipify service")
@@ -98,7 +104,7 @@ def _update_route53(
             {
                 "Action": "UPSERT",
                 "ResourceRecordSet": {
-                    "Name": f"{record}.{domain}",
+                    "Name": _get_fqdn(record, domain),
                     "Type": "A",
                     "TTL": ttl,
                     "ResourceRecords": [{"Value": ipaddress}],
