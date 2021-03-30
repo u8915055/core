@@ -2,6 +2,7 @@
 from collections import OrderedDict
 from copy import deepcopy
 import unittest
+from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 import voluptuous as vol
@@ -26,7 +27,6 @@ from homeassistant.helpers import (
 import homeassistant.helpers.config_validation as cv
 from homeassistant.setup import async_setup_component
 
-from tests.async_mock import AsyncMock, Mock, patch
 from tests.common import (
     MockEntity,
     get_test_home_assistant,
@@ -193,6 +193,24 @@ class TestServiceHelpers(unittest.TestCase):
             "list": ["list", "2"],
             "entity_id": ["hello.world"],
             "area_id": ["test-area-id"],
+        }
+
+        config = {
+            "service": "{{ 'test_domain.test_service' }}",
+            "target": {
+                "area_id": ["area-42", "{{ 'area-51' }}"],
+                "device_id": ["abcdef", "{{ 'fedcba' }}"],
+                "entity_id": ["light.static", "{{ 'light.dynamic' }}"],
+            },
+        }
+
+        service.call_from_config(self.hass, config)
+        self.hass.block_till_done()
+
+        assert dict(self.calls[1].data) == {
+            "area_id": ["area-42", "area-51"],
+            "device_id": ["abcdef", "fedcba"],
+            "entity_id": ["light.static", "light.dynamic"],
         }
 
     def test_service_template_service_call(self):
